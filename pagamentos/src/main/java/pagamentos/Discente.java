@@ -5,8 +5,8 @@ public class Discente {
 	private String cpf;
 	private String nome;
 	private String programa;
-	private double valorAnual;
-	private boolean editado = false;
+	private double valorAnual; //somatorio de todos os valores recebidos pelo discente
+	private boolean editado = false; //flag pra indicar que o discente já teve seu valor editado e não deve mais receber registro
 	
 	public String getCpf() {
 		return cpf;
@@ -42,7 +42,7 @@ public class Discente {
 	
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
+		// gerei toString só pra efetuar testes
 		return nome+" - "+cpf+"  -  "+programa+"   -   "+valorAnual;
 	}
 	

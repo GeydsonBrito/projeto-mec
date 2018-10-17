@@ -13,34 +13,32 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Main {
 
-	// adicionando o comentario no eclipse
-
 	static ArrayList<Discente> listaDeDiscentes = new ArrayList<Discente>();
-	// static ArrayList<String> naoEstaNaListaMEC = new ArrayList<String>();
 	static Discente discente;
 	static int somatorio = 0;
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws InvalidFormatException, IOException {
-		// TODO Auto-generated method stub
 
 		File file = new File("C:\\Users\\gleyd\\Music\\2017_Contabilidade.xlsx");
 
 		String cpfTemporario = "";
 
 		XSSFWorkbook book = new XSSFWorkbook(file);
-		XSSFSheet sheet = book.getSheetAt(0);
+		int abaEmQueEstaoOsDados = 0;
+		XSSFSheet sheet = book.getSheetAt(abaEmQueEstaoOsDados);
 
 		String programaAnterior = "";
+		int linhaInicial = 1;
+		int linhaFinal = 29259;
 
-		// MODIFICAR O TAMANHO DA PLANILHA DE 2017
-
-		for (int i = 1; i < 29259; i++) {
+		for (int i = linhaInicial; i < linhaFinal; i++) {
 			XSSFRow linha = sheet.getRow(i);
 			cpfTemporario = linha.getCell(1).toString();
 
-			// estou tratando o cpf quando ele vaio ser adicionado pela 1° vez ATENÇÂO
+			// aqui estou tratando o cpf quando ele vai ser adicionado pela 1° vez ATENÇÂO
 			// CPF aqui não está na lista
+
 			if ((cpfEstaNaLista(cpfTemporario) == false)) {
 				discente = new Discente();
 
@@ -63,11 +61,16 @@ public class Main {
 				discente.setValorAnual(valorAtual + soma);
 			}
 
-			// System.out.println(discente.toString());
 		}
 
+		// @ métodod gera a planilha a partir da planilha do contabilidade com o
+		// somatório dos valores de cada aluno
 		// gerarPlanilha(listaDeDiscentes);
+
+		// @ método para gerar a planilha do MEC alterada pelos valores obtidos pela
+		// planilha do contabilidade
 		alterarValorDiscentesPNAES(listaDeDiscentes);
+
 		// System.out.println(somatorio);
 
 	}
@@ -84,6 +87,8 @@ public class Main {
 
 	public static void gerarPlanilha(ArrayList<Discente> lista) throws IOException {
 
+		// onde será salvo o arquivo que extrai as informações da planilha da
+		// contabilidade e gera o novo arquivo .xlsx
 		FileOutputStream outFile = new FileOutputStream(new File("C:\\Users\\gleyd\\Desktop\\resultado2017.xlsx"));
 
 		@SuppressWarnings("resource")
@@ -115,18 +120,28 @@ public class Main {
 	public static void alterarValorDiscentesPNAES(ArrayList<Discente> discentes)
 			throws InvalidFormatException, IOException {
 		String cpfPNAES = "";
-		// começa na linha 16 até 3410 - 2017
-		File file = new File("C:\\Users\\gleyd\\Desktop\\AtendimentosPNAES2017_UFRPE.xlsx");
+
+		// Define o caminhio para a planilha do MEC
+		String caminhoArquivo = "C:\\Users\\gleyd\\Desktop\\AtendimentosPNAES2017_UFRPE.xlsx";
+
+		File file = new File(caminhoArquivo);
 
 		@SuppressWarnings("resource")
 		XSSFWorkbook workbookMEC = new XSSFWorkbook(file);
-		XSSFSheet aba = workbookMEC.getSheetAt(0);
+		
+		int abaQueEstaoOsDados = 0;
+		XSSFSheet aba = workbookMEC.getSheetAt(abaQueEstaoOsDados);
 
-		for (int i = 16; i < 3410; i++) {
+		int linhaInicial = 16;
+		int linhaFinal = 3410;
+
+		for (int i = linhaInicial; i < linhaFinal; i++) {
 			XSSFRow linha = aba.getRow(i);
+
 			cpfPNAES = linha.getCell(2).toString(); // pega o cpf da planilha do MEC
-			int posicao = cpfEstaNaListaCONTABILIDADE(cpfPNAES.toString()); // consulta se esse cpf esta na planilha do
-			// contabilidade
+
+			int posicao = cpfEstaNaListaCONTABILIDADE(cpfPNAES.toString()); // consulta se esse cpf esta na planilha da
+																			// contabilidade eretorna sua posição
 
 			if (posicao > 1) {
 				double valorParaSubstituir = discentes.get(posicao).getValorAnual(); // pega o valor que esta na
@@ -140,18 +155,22 @@ public class Main {
 						XSSFCell celulaP = linha.createCell(21);
 						celulaP.setCellValue(discentes.get(posicao).getPrograma());
 					}
-					discentes.get(posicao).setEditado(true);
+					discentes.get(posicao).setEditado(true);// essa flag serve para evitar duplicidade de registrio
 					somatorio++;
-				}else {
+				} else {
 					XSSFCell celulaP = linha.createCell(21);
 					celulaP.setCellValue(discentes.get(posicao).getPrograma());
 
 				}
-			} 
+			}
 
 		}
 
-		FileOutputStream outFile = new FileOutputStream(new File("C:\\Users\\gleyd\\Desktop\\Resultado_PNAES2017.xlsx"));
+		// Define o nome e local de salvamento do arquivo que foi editado: a planilha do
+		// MEC com os valores carregados pela planilha da contabilidade
+		String caminhoArquivoRetorno = "C:\\Users\\gleyd\\Desktop\\Resultado_PNAES2017.xlsx";
+
+		FileOutputStream outFile = new FileOutputStream(new File(caminhoArquivoRetorno));
 		workbookMEC.write(outFile);
 		outFile.close();
 		System.out.println("Arquivo PNAES editado com sucesso!");
