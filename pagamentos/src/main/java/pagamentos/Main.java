@@ -12,11 +12,11 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Main {
-	
-	//adicionando o comentario no eclipse
+
+	// adicionando o comentario no eclipse
 
 	static ArrayList<Discente> listaDeDiscentes = new ArrayList<Discente>();
-	//static ArrayList<String> naoEstaNaListaMEC = new ArrayList<String>();
+	// static ArrayList<String> naoEstaNaListaMEC = new ArrayList<String>();
 	static Discente discente;
 	static int somatorio = 0;
 
@@ -24,18 +24,18 @@ public class Main {
 	public static void main(String[] args) throws InvalidFormatException, IOException {
 		// TODO Auto-generated method stub
 
-		File file = new File("C:\\Users\\gleyd\\Music\\contabilidade.xlsx");
+		File file = new File("C:\\Users\\gleyd\\Music\\2017_Contabilidade.xlsx");
 
 		String cpfTemporario = "";
 
 		XSSFWorkbook book = new XSSFWorkbook(file);
-		XSSFSheet sheet = book.getSheetAt(1);
+		XSSFSheet sheet = book.getSheetAt(0);
 
 		String programaAnterior = "";
 
-		//MODIFICAR O TAMANHO DA PLANILHA DE 2017
-		
-		for (int i = 1; i < 27625; i++) {
+		// MODIFICAR O TAMANHO DA PLANILHA DE 2017
+
+		for (int i = 1; i < 29259; i++) {
 			XSSFRow linha = sheet.getRow(i);
 			cpfTemporario = linha.getCell(1).toString();
 
@@ -68,7 +68,7 @@ public class Main {
 
 		// gerarPlanilha(listaDeDiscentes);
 		alterarValorDiscentesPNAES(listaDeDiscentes);
-		System.out.println(somatorio);
+		// System.out.println(somatorio);
 
 	}
 
@@ -84,8 +84,8 @@ public class Main {
 
 	public static void gerarPlanilha(ArrayList<Discente> lista) throws IOException {
 
-		FileOutputStream outFile = new FileOutputStream(new File("C:\\Users\\gleyd\\Desktop\\resultado.xlsx"));
-		
+		FileOutputStream outFile = new FileOutputStream(new File("C:\\Users\\gleyd\\Desktop\\resultado2017.xlsx"));
+
 		@SuppressWarnings("resource")
 		XSSFWorkbook w = new XSSFWorkbook();
 		XSSFSheet s = w.createSheet();
@@ -115,14 +115,14 @@ public class Main {
 	public static void alterarValorDiscentesPNAES(ArrayList<Discente> discentes)
 			throws InvalidFormatException, IOException {
 		String cpfPNAES = "";
-		// começa na linha 0 até 3416
-		File file = new File("C:\\Users\\gleyd\\Music\\consulta.xlsx");
+		// começa na linha 16 até 3410 - 2017
+		File file = new File("C:\\Users\\gleyd\\Desktop\\AtendimentosPNAES2017_UFRPE.xlsx");
 
 		@SuppressWarnings("resource")
 		XSSFWorkbook workbookMEC = new XSSFWorkbook(file);
 		XSSFSheet aba = workbookMEC.getSheetAt(0);
 
-		for (int i = 0; i < 3416; i++) {
+		for (int i = 16; i < 3410; i++) {
 			XSSFRow linha = aba.getRow(i);
 			cpfPNAES = linha.getCell(2).toString(); // pega o cpf da planilha do MEC
 			int posicao = cpfEstaNaListaCONTABILIDADE(cpfPNAES.toString()); // consulta se esse cpf esta na planilha do
@@ -134,16 +134,24 @@ public class Main {
 				if (discentes.get(posicao).isEditado() == false) {
 					XSSFCell celula = linha.createCell(20);
 					celula.setCellValue(valorParaSubstituir);
+
+					XSSFCell celulaPrograma = linha.getCell(21);
+					if (celulaPrograma == null) {
+						XSSFCell celulaP = linha.createCell(21);
+						celulaP.setCellValue(discentes.get(posicao).getPrograma());
+					}
 					discentes.get(posicao).setEditado(true);
 					somatorio++;
+				}else {
+					XSSFCell celulaP = linha.createCell(21);
+					celulaP.setCellValue(discentes.get(posicao).getPrograma());
+
 				}
-			} /*
-				 * else { discentes.get(posicao).setEditado(true); }
-				 */
+			} 
 
 		}
 
-		FileOutputStream outFile = new FileOutputStream(new File("C:\\Users\\gleyd\\Desktop\\Resultado_PNAES.xlsx"));
+		FileOutputStream outFile = new FileOutputStream(new File("C:\\Users\\gleyd\\Desktop\\Resultado_PNAES2017.xlsx"));
 		workbookMEC.write(outFile);
 		outFile.close();
 		System.out.println("Arquivo PNAES editado com sucesso!");
